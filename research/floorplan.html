@@ -1,0 +1,309 @@
+<title>탑연리 2층 창고 배치도</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+KR:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#F4F2EC; --sheet:#FBFAF6; --ink:#1A2028; --ink-2:#4A5560; --rule:#B9B3A6;
+  --hair:#DCD7CB; --corr:#EAE6DC;
+  --u1:#C3D2DA; --u2:#8FB0C2; --u3:#54819C; --u4:#2E5A74;
+  --core-bg:#E4D3BE; --core-ln:#B0854F; --core-tx:#6B4A20;
+  --accent:#B0854F; --neg:#A63D2F;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#12161B; --sheet:#1A1F26; --ink:#E4E0D6; --ink-2:#9AA3AC; --rule:#5A6068;
+    --hair:#2C333B; --corr:#232931;
+    --u1:#3E5560; --u2:#4E7286; --u3:#6E9CB4; --u4:#9CC0D4;
+    --core-bg:#3A2E20; --core-ln:#8A6635; --core-tx:#D9BC8B;
+    --accent:#C89A5E; --neg:#D9705E;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#12161B; --sheet:#1A1F26; --ink:#E4E0D6; --ink-2:#9AA3AC; --rule:#5A6068;
+  --hair:#2C333B; --corr:#232931;
+  --u1:#3E5560; --u2:#4E7286; --u3:#6E9CB4; --u4:#9CC0D4;
+  --core-bg:#3A2E20; --core-ln:#8A6635; --core-tx:#D9BC8B;
+  --accent:#C89A5E; --neg:#D9705E;
+}
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);
+  font-family:"IBM Plex Sans KR",system-ui,-apple-system,"Malgun Gothic",sans-serif;
+  font-weight:400;line-height:1.6;padding:28px 20px 64px}
+.sheet{max-width:1180px;margin:0 auto;background:var(--sheet);
+  border:1px solid var(--hair);box-shadow:0 1px 0 var(--hair)}
+.tb{display:grid;grid-template-columns:1.6fr repeat(4,1fr);border-bottom:2px solid var(--ink)}
+.tb>div{padding:16px 18px;border-right:1px solid var(--hair)}
+.tb>div:last-child{border-right:0}
+.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-2);margin-bottom:6px}
+h1{font-size:23px;font-weight:600;margin:0;letter-spacing:-.01em;text-wrap:balance}
+.tb .v{font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:500;
+  font-variant-numeric:tabular-nums}
+.plan{padding:22px 18px 6px;overflow-x:auto}
+svg{display:block;width:100%;min-width:720px;height:auto}
+.dim{font-family:"IBM Plex Mono",monospace;font-size:19px;fill:var(--ink-2);
+  text-anchor:middle;font-weight:500}
+.bandtag{font-family:"IBM Plex Mono",monospace;font-size:34px;font-weight:600;
+  fill:var(--ink);text-anchor:end;opacity:.5}
+.corrtag{font-family:"IBM Plex Mono",monospace;font-size:17px;fill:var(--ink-2);text-anchor:middle}
+.lbl-core{font-size:21px;font-weight:600;fill:var(--core-tx);text-anchor:middle}
+.lbl-core-s{font-family:"IBM Plex Mono",monospace;font-size:17px;fill:var(--core-tx);
+  text-anchor:middle;opacity:.85}
+.legend{display:flex;flex-wrap:wrap;gap:20px;padding:4px 20px 20px;
+  border-bottom:1px solid var(--hair)}
+.lg{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-2)}
+.sw{width:26px;height:15px;border:1.5px solid var(--ink);flex:none}
+.cols{display:grid;grid-template-columns:1.55fr 1fr;gap:0}
+@media (max-width:860px){.cols{grid-template-columns:1fr}.tb{grid-template-columns:1fr 1fr}}
+section{padding:20px 22px;border-right:1px solid var(--hair)}
+section:last-child{border-right:0}
+h2{font-size:12px;font-weight:600;letter-spacing:.13em;text-transform:uppercase;
+  color:var(--ink-2);margin:0 0 14px;font-family:"IBM Plex Mono",monospace}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{font-family:"IBM Plex Mono",monospace;font-size:10.5px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-2);font-weight:500;text-align:left;
+  padding:0 8px 8px;border-bottom:1px solid var(--ink)}
+td{padding:8px;border-bottom:1px solid var(--hair)}
+.num{font-family:"IBM Plex Mono",monospace;text-align:right;
+  font-variant-numeric:tabular-nums}
+th.num{text-align:right}
+.bd{font-family:"IBM Plex Mono",monospace;font-weight:600}
+tfoot td{border-bottom:0;border-top:2px solid var(--ink);font-weight:600;padding-top:10px}
+.chip{display:inline-block;font-size:10px;padding:1px 6px;border:1px solid var(--rule);
+  color:var(--ink-2);margin-left:4px;vertical-align:1px}
+.r.hi td{background:color-mix(in srgb,var(--accent) 13%,transparent);font-weight:600}
+.neg{color:var(--neg)}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);border-top:2px solid var(--ink)}
+.kpi>div{padding:16px 18px;border-right:1px solid var(--hair)}
+.kpi>div:last-child{border-right:0}
+.kpi .n{font-family:"IBM Plex Mono",monospace;font-size:25px;font-weight:600;
+  letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.notes{padding:20px 22px;border-top:1px solid var(--hair);font-size:13.5px;
+  color:var(--ink-2);max-width:78ch}
+.notes li{margin-bottom:7px}
+.notes b{color:var(--ink);font-weight:600}
+.warn{border-left:3px solid var(--accent);padding-left:14px;margin:14px 0 0}
+</style>
+
+<div class="sheet">
+  <div class="tb">
+    <div><div class="eyebrow">도면명</div><h1>2층 셀프스토리지 배치 평면도</h1></div>
+    <div><div class="eyebrow">위치</div><div class="v" style="font-size:13px">청주 흥덕구<br>강내면 탑연리 263-3·4</div></div>
+    <div><div class="eyebrow">해당 층</div><div class="v">2F / 70.1평</div></div>
+    <div><div class="eyebrow">유닛 수</div><div class="v">110개</div></div>
+    <div><div class="eyebrow">작성일</div><div class="v">2026.09.02</div></div>
+  </div>
+
+  <div class="plan"><svg viewBox="0 0 2140 1400" role="img" aria-label="2층 셀프스토리지 배치 평면도">
+<defs>
+<pattern id="core" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+<rect width="14" height="14" fill="var(--core-bg)"/><line x1="0" y1="0" x2="0" y2="14" stroke="var(--core-ln)" stroke-width="2.5"/></pattern>
+</defs>
+<rect x="140" y="120" width="1930.0" height="1200.0" fill="var(--corr)"/>
+<rect x="140" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="140" y1="185" x2="240" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="240" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="240" y1="185" x2="340" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="340" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="340" y1="185" x2="440" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="440" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="440" y1="185" x2="540" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="540" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="540" y1="185" x2="640" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="640" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="640" y1="185" x2="740" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="740" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="740" y1="185" x2="840" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="840" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="840" y1="185" x2="940" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="940" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="940" y1="185" x2="1040" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="1040" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="1040" y1="185" x2="1140" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="1140" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="1140" y1="185" x2="1240" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="1240" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="1240" y1="185" x2="1340" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="1340" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="1340" y1="185" x2="1440" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="1440" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="1440" y1="185" x2="1540" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="1540" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="1540" y1="185" x2="1640" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="1640" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="1640" y1="185" x2="1740" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="1740" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="1740" y1="185" x2="1840" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="1840" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="1840" y1="185" x2="1940" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="1940" y="120" width="100" height="130" fill="var(--u1)" stroke="var(--ink)" stroke-width="1.6"/>
+<line x1="1940" y1="185" x2="2040" y2="185" stroke="var(--ink)" stroke-width="1" stroke-dasharray="5 4"/>
+<rect x="140" y="370" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="240" y="370" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="340" y="370" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="640" y="370" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="740" y="370" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="840" y="370" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="940" y="370" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1040" y="370" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1140" y="370" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1240" y="370" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1340" y="370" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1440" y="370" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1540" y="370" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1640" y="370" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1740" y="370" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1840" y="370" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1940" y="370" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="140" y="510" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="240" y="510" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="340" y="510" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="640" y="510" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="740" y="510" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="840" y="510" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="940" y="510" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1040" y="510" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1140" y="510" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1240" y="510" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1340" y="510" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1440" y="510" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1540" y="510" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1640" y="510" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1740" y="510" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1840" y="510" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1940" y="510" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="140" y="770" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="240" y="770" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="340" y="770" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="640" y="770" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="740" y="770" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="840" y="770" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="940" y="770" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1040" y="770" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1140" y="770" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1240" y="770" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1340" y="770" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1440" y="770" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1540" y="770" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1640" y="770" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1740" y="770" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1840" y="770" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1940" y="770" width="100" height="140" fill="var(--u2)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="640" y="910" width="120" height="140" fill="var(--u3)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="760" y="910" width="120" height="140" fill="var(--u3)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="880" y="910" width="120" height="140" fill="var(--u3)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1000" y="910" width="120" height="140" fill="var(--u3)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1120" y="910" width="120" height="140" fill="var(--u3)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1240" y="910" width="120" height="140" fill="var(--u3)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1360" y="910" width="120" height="140" fill="var(--u3)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1480" y="910" width="120" height="140" fill="var(--u3)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1600" y="910" width="120" height="140" fill="var(--u3)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1720" y="910" width="120" height="140" fill="var(--u3)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1840" y="910" width="120" height="140" fill="var(--u3)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="490" y="1170" width="150" height="150" fill="var(--u4)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="640" y="1170" width="150" height="150" fill="var(--u4)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="790" y="1170" width="150" height="150" fill="var(--u4)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="940" y="1170" width="150" height="150" fill="var(--u4)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1090" y="1170" width="150" height="150" fill="var(--u4)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1240" y="1170" width="150" height="150" fill="var(--u4)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1390" y="1170" width="150" height="150" fill="var(--u4)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1540" y="1170" width="150" height="150" fill="var(--u4)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1690" y="1170" width="150" height="150" fill="var(--u4)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="1840" y="1170" width="150" height="150" fill="var(--u4)" stroke="var(--ink)" stroke-width="1.6"/>
+<rect x="140.0" y="920.0" width="350.0" height="400.0" fill="url(#core)" stroke="var(--ink)" stroke-width="3"/>
+<text x="315.0" y="1106.0" class="lbl-core">계단 · 화장실</text>
+<text x="315.0" y="1138.0" class="lbl-core-s">3.5 × 4.0m · 4.24평</text>
+<rect x="140" y="120" width="1930.0" height="1200.0" fill="none" stroke="var(--ink)" stroke-width="7"/>
+<text x="2055.0" y="192.0" class="bandtag">A</text>
+<text x="2055.0" y="447.0" class="bandtag">B</text>
+<text x="2055.0" y="587.0" class="bandtag">C</text>
+<text x="2055.0" y="847.0" class="bandtag">D</text>
+<text x="2055.0" y="987.0" class="bandtag">E</text>
+<text x="2055.0" y="1252.0" class="bandtag">F</text>
+<text x="1105.0" y="316.0" class="corrtag">통로 1.2m</text>
+<text x="1105.0" y="716.0" class="corrtag">통로 1.2m</text>
+<text x="1280.0" y="1116.0" class="corrtag">통로 1.2m</text>
+<text transform="translate(565.0,710.0) rotate(-90)" class="corrtag">연결통로 1.5m</text>
+<line x1="140" y1="74" x2="2070.0" y2="74" stroke="var(--rule)" stroke-width="2"/><line x1="140" y1="65" x2="140" y2="83" stroke="var(--rule)" stroke-width="2"/><line x1="2070.0" y1="65" x2="2070.0" y2="83" stroke="var(--rule)" stroke-width="2"/><text x="1105.0" y="60" class="dim">19,300</text>
+<line x1="88" y1="120" x2="88" y2="1320.0" stroke="var(--rule)" stroke-width="2"/><line x1="79" y1="120" x2="97" y2="120" stroke="var(--rule)" stroke-width="2"/><line x1="79" y1="1320.0" x2="97" y2="1320.0" stroke="var(--rule)" stroke-width="2"/><text transform="translate(76,720.0) rotate(-90)" class="dim">12,000</text>
+<line x1="2110.0" y1="120.0" x2="2110.0" y2="250.0" stroke="var(--rule)" stroke-width="2"/><line x1="2101.0" y1="120.0" x2="2119.0" y2="120.0" stroke="var(--rule)" stroke-width="2"/><line x1="2101.0" y1="250.0" x2="2119.0" y2="250.0" stroke="var(--rule)" stroke-width="2"/><text transform="translate(2098.0,185.0) rotate(-90)" class="dim">1,300</text>
+<line x1="2110.0" y1="370.0" x2="2110.0" y2="510.0" stroke="var(--rule)" stroke-width="2"/><line x1="2101.0" y1="370.0" x2="2119.0" y2="370.0" stroke="var(--rule)" stroke-width="2"/><line x1="2101.0" y1="510.0" x2="2119.0" y2="510.0" stroke="var(--rule)" stroke-width="2"/><text transform="translate(2098.0,440.0) rotate(-90)" class="dim">1,400</text>
+<line x1="2110.0" y1="510.0" x2="2110.0" y2="650.0" stroke="var(--rule)" stroke-width="2"/><line x1="2101.0" y1="510.0" x2="2119.0" y2="510.0" stroke="var(--rule)" stroke-width="2"/><line x1="2101.0" y1="650.0" x2="2119.0" y2="650.0" stroke="var(--rule)" stroke-width="2"/><text transform="translate(2098.0,580.0) rotate(-90)" class="dim">1,400</text>
+<line x1="2110.0" y1="770.0" x2="2110.0" y2="910.0" stroke="var(--rule)" stroke-width="2"/><line x1="2101.0" y1="770.0" x2="2119.0" y2="770.0" stroke="var(--rule)" stroke-width="2"/><line x1="2101.0" y1="910.0" x2="2119.0" y2="910.0" stroke="var(--rule)" stroke-width="2"/><text transform="translate(2098.0,840.0) rotate(-90)" class="dim">1,400</text>
+<line x1="2110.0" y1="910.0" x2="2110.0" y2="1050.0" stroke="var(--rule)" stroke-width="2"/><line x1="2101.0" y1="910.0" x2="2119.0" y2="910.0" stroke="var(--rule)" stroke-width="2"/><line x1="2101.0" y1="1050.0" x2="2119.0" y2="1050.0" stroke="var(--rule)" stroke-width="2"/><text transform="translate(2098.0,980.0) rotate(-90)" class="dim">1,400</text>
+<line x1="2110.0" y1="1170.0" x2="2110.0" y2="1320.0" stroke="var(--rule)" stroke-width="2"/><line x1="2101.0" y1="1170.0" x2="2119.0" y2="1170.0" stroke="var(--rule)" stroke-width="2"/><line x1="2101.0" y1="1320.0" x2="2119.0" y2="1320.0" stroke="var(--rule)" stroke-width="2"/><text transform="translate(2098.0,1245.0) rotate(-90)" class="dim">1,500</text>
+</svg></div>
+
+  <div class="legend">
+    <div class="lg"><span class="sw" style="background:var(--u1)"></span>로커 1.49㎥ · 2단 적층</div>
+    <div class="lg"><span class="sw" style="background:var(--u2)"></span>소형 3.36㎥</div>
+    <div class="lg"><span class="sw" style="background:var(--u3)"></span>중형 4.03㎥</div>
+    <div class="lg"><span class="sw" style="background:var(--u4)"></span>중형+ 5.40㎥</div>
+    <div class="lg"><span class="sw" style="background:var(--core-bg);border-color:var(--core-ln)"></span>계단 · 화장실 (고정)</div>
+    <div class="lg"><span class="sw" style="background:var(--corr)"></span>통로 · 연결통로</div>
+  </div>
+
+  <div class="cols">
+    <section>
+      <h2>유닛 스케줄</h2>
+      <table>
+        <thead><tr><th>밴드</th><th>구분</th><th class="num">W×D×H (m)</th><th class="num">㎥</th>
+        <th class="num">개수</th><th class="num">월 단가</th><th class="num">소계</th></tr></thead>
+        <tbody><tr><td class="bd">A</td><td>로커 <span class="chip">2단 적층</span></td>
+<td class="num">1.0 × 1.3 × 1.15</td><td class="num">1.49</td>
+<td class="num">38</td><td class="num">50,000</td><td class="num">1,900,000</td></tr><tr><td class="bd">B</td><td>소형</td>
+<td class="num">1.0 × 1.4 × 2.4</td><td class="num">3.36</td>
+<td class="num">17</td><td class="num">90,000</td><td class="num">1,530,000</td></tr><tr><td class="bd">C</td><td>소형</td>
+<td class="num">1.0 × 1.4 × 2.4</td><td class="num">3.36</td>
+<td class="num">17</td><td class="num">90,000</td><td class="num">1,530,000</td></tr><tr><td class="bd">D</td><td>소형</td>
+<td class="num">1.0 × 1.4 × 2.4</td><td class="num">3.36</td>
+<td class="num">17</td><td class="num">90,000</td><td class="num">1,530,000</td></tr><tr><td class="bd">E</td><td>중형</td>
+<td class="num">1.2 × 1.4 × 2.4</td><td class="num">4.03</td>
+<td class="num">11</td><td class="num">100,000</td><td class="num">1,100,000</td></tr><tr><td class="bd">F</td><td>중형+</td>
+<td class="num">1.5 × 1.5 × 2.4</td><td class="num">5.40</td>
+<td class="num">10</td><td class="num">120,000</td><td class="num">1,200,000</td></tr></tbody>
+        <tfoot><tr><td colspan="4">만실 기준</td><td class="num">110</td><td></td>
+        <td class="num">8,790,000</td></tr></tfoot>
+      </table>
+    </section>
+    <section>
+      <h2>점유율별 월 손익 · 월세 300만원</h2>
+      <table>
+        <thead><tr><th class="num">점유율</th><th class="num">계약</th><th class="num">월매출</th><th class="num">월순익</th></tr></thead>
+        <tbody><tr class="r"><td class="num">50%</td><td class="num">55개</td><td class="num">4,395,000</td><td class="num" class="neg">-192,900</td></tr><tr class="r"><td class="num">60%</td><td class="num">66개</td><td class="num">5,274,000</td><td class="num">668,520</td></tr><tr class="r"><td class="num">70%</td><td class="num">77개</td><td class="num">6,153,000</td><td class="num">1,529,940</td></tr><tr class="r hi"><td class="num">80%</td><td class="num">88개</td><td class="num">7,032,000</td><td class="num">2,391,360</td></tr><tr class="r"><td class="num">90%</td><td class="num">99개</td><td class="num">7,911,000</td><td class="num">3,252,780</td></tr><tr class="r"><td class="num">100%</td><td class="num">110개</td><td class="num">8,790,000</td><td class="num">4,114,200</td></tr></tbody>
+      </table>
+      <p style="font-size:12.5px;color:var(--ink-2);margin:14px 0 0">
+      고정비 4,500,000원 = 임대료 300만 + 관리비 35만 + 전기·수도 25만 + 보안 15만 +
+      청소·방역 20만 + 마케팅 40만 + 보험·세무 15만. 여기에 카드수수료 매출 2% 별도.</p>
+    </section>
+  </div>
+
+  <div class="kpi">
+    <div><div class="eyebrow">만실 월매출</div><div class="n">879만원</div></div>
+    <div><div class="eyebrow">임대효율</div><div class="n">59.2%</div></div>
+    <div><div class="eyebrow">손익분기 점유율</div><div class="n">52.2%</div></div>
+    <div><div class="eyebrow">평당 만실매출</div><div class="n">12.5만원</div></div>
+  </div>
+
+  <div class="notes">
+    <h2 style="margin-bottom:12px">배치 근거 및 확인 사항</h2>
+    <ul style="margin:0;padding-left:18px">
+      <li><b>왜 통로를 3열이나 냈는가</b> — 밴드를 2.3m 이상으로 깊게 잡으면 유닛 하나가 6㎥를 넘어
+      중대형만 나옵니다. 소형·중형 위주로 가려면 밴드를 1.3~1.5m로 얕게 두고 통로를 하나 더 내주는
+      편이 유리합니다. 통로 3열 각각이 양옆 밴드 2개를 담당합니다.</li>
+      <li><b>임대효율 59.2%</b> — 셀프스토리지 표준(60~70%)의 하단입니다. 소형 위주 구성의 대가이며,
+      대형 위주로 바꾸면 효율은 67%까지 오르지만 만실매출은 812만원으로 떨어집니다.</li>
+      <li><b>A밴드 로커는 2단 적층</b> — 높이 1.15m씩 상·하단으로 나눠 같은 바닥면적에서 유닛 수를
+      2배로 만듭니다. 상단은 사다리 없이 손이 닿는 높이(하단 상부 1.15m)를 유지했습니다.</li>
+      <li><b>자투리 6.8㎡</b> — 밴드 끝단에 유닛 폭으로 나누어떨어지지 않는 0.8~1.1m 구간이 남습니다.
+      청소도구함, 대차 보관, 소화기함으로 쓰십시오.</li>
+      <li class="warn"><b>실측 도면이 나오면 다시 계산해야 합니다.</b> 이 배치는 12.0m × 19.3m 직사각형을
+      가정한 것입니다. 실제 기둥 위치, 출입구, 소방 동선, 창호 위치에 따라 유닛 수가 <b>10~15% 줄어들 수
+      있습니다</b>. 특히 내부 기둥이 있으면 밴드 분할이 깨집니다.</li>
+      <li><b>단가 산정</b> — 청주 경쟁사 실단가(알파박스·아이엠박스·옐로박스)를 부피 기준으로 회귀한
+      값입니다. 신규 진입 가격대로, 아이엠박스 정가보다 낮고 할인가와 비슷한 수준입니다.</li>
+      <li><b>소방·건축 확인</b> — 2층 창고 용도로 스프링클러 헤드 재배치, 피난거리(30m 이내),
+      비상조명이 필요할 수 있습니다. 유닛 벽체를 천장까지 막지 않고 상부를 트는 방식이면
+      소방 조건이 완화되는 경우가 많으니 소방 감리와 먼저 상의하십시오.</li>
+    </ul>
+  </div>
+</div>
