@@ -1,0 +1,13 @@
+{
+  "name": "ai-village",
+  "version": "0.1.0",
+  "description": "Claude 서브에이전트로 이루어진 AI 마을 — 주민은 에이전트, 세계는 규칙 기반 엔진",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=20" },
+  "bin": { "village": "./village/village.mjs" },
+  "scripts": {
+    "village": "node village/village.mjs",
+    "test": "node --test test/*.test.mjs"
+  }
+}

@@ -1,0 +1,6 @@
+node_modules/
+
+# 마을의 현재 상태와 일지는 각자의 것이다. 저장소에 남기지 않는다.
+# 다시 세우려면: node village/village.mjs init --extended
+village/state.json
+village/chronicle.md
