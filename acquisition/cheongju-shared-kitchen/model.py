@@ -71,6 +71,31 @@ def scenario(name, sales, vat_included=False):
     return name, sales, pre, vat, severance, before_tax, tax, before_tax - tax
 
 
+# 뉴탑이앤지 자금조달안: 1억 차입, 3개월 거치 후 월 1,000만 × 10회 + 투자수익금 3,000만
+LOAN = {"principal": 10_000, "grace": 3, "installment": 1_000, "return": 3_000}
+
+
+def loan_irr(cashflows):
+    """월 단위 내부수익률 (이분법). cashflows[0]은 차입액(+), 이후 상환액(−)."""
+    lo, hi = 0.0, 1.0
+    for _ in range(200):
+        mid = (lo + hi) / 2
+        npv = sum(c / (1 + mid) ** t for t, c in enumerate(cashflows))
+        lo, hi = (lo, mid) if npv > 0 else (mid, hi)
+    return mid
+
+
+def loan_schedule(return_at_end=True):
+    n = LOAN["principal"] // LOAN["installment"]
+    flows = [LOAN["principal"]] + [0] * LOAN["grace"]
+    if return_at_end:
+        flows += [-LOAN["installment"]] * n
+        flows[-1] -= LOAN["return"]
+    else:
+        flows += [-(LOAN["installment"] + LOAN["return"] / n)] * n
+    return flows
+
+
 def main():
     sales = list(MONTHLY_SALES.values())
     last12 = sales[-12:]
@@ -102,6 +127,17 @@ def main():
     for r in rows:
         months = total / r[-1] if r[-1] > 0 else float("inf")
         print(f"  {r[0]}: 세후 기준 회수 {months:.1f}개월")
+
+    print("\n== 자금조달안 (1억, 3개월 거치, 월 1,000만 × 10회 + 수익금 3,000만) ==")
+    for label, at_end in (("수익금 만기 일시지급", True), ("수익금 10회 분할", False)):
+        r = loan_irr(loan_schedule(at_end))
+        print(f"  {label}: 월 {r*100:.2f}% → 연 환산 {r*1200:.1f}% "
+              f"(이자제한법 상한 연 20%)")
+    monthly_due = LOAN["installment"] + LOAN["return"] / 10
+    print(f"  상환기간 월 부담(분할 기준) {monthly_due:,.0f}만원 vs 세전 이익:")
+    for r in rows[1:]:
+        print(f"    {r[0]}: 세전 {r[5]:,.0f} → 상환 후 {r[5]-monthly_due:,.0f} "
+              f"(DSCR {r[5]/monthly_due:.2f})")
 
 
 if __name__ == "__main__":
