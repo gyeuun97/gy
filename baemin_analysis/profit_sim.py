@@ -1,7 +1,7 @@
 """4개 브랜드 배달 샵인샵 월 손익 시뮬레이션 (충북대·사창동, 월세 100만원).
 
 모든 가정값은 이 파일 상단에 모여 있다. 숫자를 바꾸고 다시 실행하면 엑셀이 갱신된다.
-사용법: python3 profit_sim.py [OUT.xlsx]
+사용법: python3 profit_sim.py [OUT.xlsx] [FONT_DIR]
 """
 import sys
 
@@ -272,7 +272,12 @@ def main():
     ws.column_dimensions["A"].width = 58
     ws.column_dimensions["B"].width = 16
 
+    import target_sim
+    target_sim.build_target_sheets(wb)
     wb.save(OUT)
+    font_dir = sys.argv[2] if len(sys.argv) > 2 else None
+    if font_dir:   # NotoSansKR-400/700.ttf가 있는 폴더를 주면 시간대별 그래프 PNG도 만든다
+        target_sim.draw_hourly_png("시간대별_처리량.png", font_dir)
 
     # 콘솔 요약
     for b in BRANDS:
