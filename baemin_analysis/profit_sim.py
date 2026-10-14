@@ -131,6 +131,15 @@ def breakeven(target):
     return None
 
 
+WON = '#,##0"원"'
+PCT = '0.0"%"'   # 값은 ×100 해서 저장: 서식을 무시하는 뷰어에서도 21.7로 읽힘
+
+
+def pct(cell, ratio):
+    cell.value = round(ratio * 100, 1)
+    cell.number_format = PCT
+
+
 HEAD = PatternFill("solid", fgColor="2AC1BC")
 WB = Font(bold=True, color="FFFFFF")
 B = Font(bold=True)
@@ -155,23 +164,23 @@ def main():
         ("월 매출 (할인 후)", "sales"), ("식자재 원가", "food"), ("배민 중개·결제수수료", "fees"),
         ("배달비 (점주 부담)", "delivery"), ("포장재", "pack"), ("부가세 순부담", "vat"),
         ("공헌이익 (변동비 차감 후)", "contrib"), ("고정비 합계", "fixed"),
-        ("알바 근무시간 (h/월)", "hours"), ("인건비 (알바)", "labor"),
+        ("알바 근무시간 (월)", "hours"), ("인건비 (알바)", "labor"),
         ("영업이익 (사장 몫, 세전)", "profit"), (f"사장 인건비 {OWNER_WAGE // 10000}만원 차감 후", "after_owner"),
     ]
     for i, (label, key) in enumerate(lines, 2):
         ws.cell(i, 1, label).font = B if key in ("contrib", "profit", "after_owner") else Font()
         for j, r in enumerate(results, 2):
             cell = ws.cell(i, j, round(r[key]))
-            cell.number_format = "#,##0"
+            cell.number_format = '#,##0"시간"' if key == "hours" else WON
             if key in ("profit", "after_owner"):
                 cell.font = Font(bold=True, color="C0392B" if r[key] < 0 else "0F8F8A")
     row = len(lines) + 2
     ws.cell(row, 1, "공헌이익률").font = B
     for j, r in enumerate(results, 2):
-        ws.cell(row, j, r["contrib"] / r["sales"]).number_format = "0.0%"
+        pct(ws.cell(row, j), r["contrib"] / r["sales"])
     ws.cell(row + 1, 1, "영업이익률").font = B
     for j, r in enumerate(results, 2):
-        ws.cell(row + 1, j, r["profit"] / r["sales"]).number_format = "0.0%"
+        pct(ws.cell(row + 1, j), r["profit"] / r["sales"])
     ws.column_dimensions["A"].width = 34
     for col in "BCDE":
         ws.column_dimensions[col].width = 18
@@ -188,9 +197,9 @@ def main():
         for j, v in enumerate(vals, 1):
             cell = ws.cell(i, j, v)
             if j in (2, 7, 13):
-                cell.number_format = "0.0%"
+                pct(cell, v)
             elif isinstance(v, (int, float)):
-                cell.number_format = "#,##0"
+                cell.number_format = WON
     ws.column_dimensions["A"].width = 26
     ws.column_dimensions["N"].width = 28
 
@@ -213,11 +222,14 @@ def main():
         for j, v in enumerate([name, p, c, DELIVERY_FEE, com, pay, m, m / p, 900, 1000,
                                round(rp * NET_VAT), round(rm), rm / rp], 1):
             cell = ws.cell(i, j, v)
-            cell.number_format = "0.0%" if j in (8, 13) else "#,##0"
+            if j in (8, 13):
+                pct(cell, v)
+            elif j > 1:
+                cell.number_format = WON
     r = len(table) + 2
     ws.cell(r, 1, "매출 가중 평균").font = B
-    ws.cell(r, 8, tot_m / tot_p).number_format = "0.0%"
-    ws.cell(r, 13, tot_rm / tot_rp).number_format = "0.0%"
+    pct(ws.cell(r, 8), tot_m / tot_p)
+    pct(ws.cell(r, 13), tot_rm / tot_rp)
     ws.cell(r + 1, 1, "본사 표기 '평균 마진율 46%'는 표의 단순평균(43.6%)·가중평균(44.9%) 어느 쪽과도 맞지 않음")
     ws.column_dimensions["A"].width = 30
 
@@ -226,18 +238,18 @@ def main():
     ws.cell(1, 1, "월 고정비").font = B
     for i, (k, v) in enumerate(FIXED, 2):
         ws.cell(i, 1, k)
-        ws.cell(i, 2, v).number_format = "#,##0"
+        ws.cell(i, 2, v).number_format = WON
     r = len(FIXED) + 2
     ws.cell(r, 1, "합계").font = B
-    ws.cell(r, 2, sum(v for _, v in FIXED)).number_format = "#,##0"
+    ws.cell(r, 2, sum(v for _, v in FIXED)).number_format = WON
     r += 2
     ws.cell(r, 1, "인건비 가정").font = B
-    for k, v in [("2026 최저시급", MIN_WAGE), ("알바 시간당 실비용 (주휴·보험 포함)", HOURLY),
-                 ("영업시간 (h/일)", OPEN_HOURS), ("사장 근무 (h/월)", OWNER_HOURS_MONTH),
-                 ("사장 인건비 환산 (판단용)", OWNER_WAGE)]:
+    for k, v, fmt in [("2026 최저시급", MIN_WAGE, WON), ("알바 시간당 실비용 (주휴·보험 포함)", HOURLY, WON),
+                      ("영업시간 (하루)", OPEN_HOURS, '0"시간"'), ("사장 근무 (월)", OWNER_HOURS_MONTH, '0"시간"'),
+                      ("사장 인건비 환산 (판단용)", OWNER_WAGE, WON)]:
         r += 1
         ws.cell(r, 1, k)
-        ws.cell(r, 2, v).number_format = "#,##0"
+        ws.cell(r, 2, v).number_format = fmt
     r += 1
     ws.cell(r, 1, "※ 5인 미만 사업장은 야간·연장 가산수당 의무 없음 (근로기준법 적용 범위)")
     r += 2
@@ -245,18 +257,18 @@ def main():
     for k, v in INITIAL:
         r += 1
         ws.cell(r, 1, k)
-        ws.cell(r, 2, v).number_format = "#,##0"
+        ws.cell(r, 2, v).number_format = WON
     r += 1
     total_init = sum(v for _, v in INITIAL)
     ws.cell(r, 1, "합계").font = B
-    ws.cell(r, 2, total_init).number_format = "#,##0"
+    ws.cell(r, 2, total_init).number_format = WON
     r += 2
     ws.cell(r, 1, "손익분기 (일 주문수)").font = B
     for k, target in [("영업이익 0원", 0), ("사장 월 300만원 확보", OWNER_WAGE),
                       ("사장 300만 + 투자금 24개월 회수", OWNER_WAGE + total_init / 24)]:
         r += 1
         ws.cell(r, 1, k)
-        ws.cell(r, 2, breakeven(target))
+        ws.cell(r, 2, breakeven(target)).number_format = '0"건/일"'
     ws.column_dimensions["A"].width = 58
     ws.column_dimensions["B"].width = 16
 
