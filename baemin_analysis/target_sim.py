@@ -16,29 +16,31 @@ TARGET = 150_000_000
 PLAN_B = {"김치찜": dict(aov=24000, cost_rate=0.29), "제육덮밥": dict(aov=18000, cost_rate=0.32)}
 
 DINNER_PEAK_SHARE = 0.30   # 18~20시 2시간에 하루 주문의 30%가 몰린다고 가정
-NIGHT_PREMIUM_HOURLY = 14_500  # 5인 이상: 야간가산·4대보험 반영 평균 시급
-SMALL_HOURLY = ps.HOURLY       # 5인 미만: 주휴·산재·고용 반영 시급
+SMALL_HOURLY = ps.HOURLY       # 5인 미만: 주휴·산재·고용 반영 시급 (가산수당 의무 없음)
+BIG_DAY_HOURLY = 13_500        # 5인 이상 주간: 주휴 + 4대보험 사업주 부담
+BIG_NIGHT_HOURLY = BIG_DAY_HOURLY + round(ps.MIN_WAGE * 0.5)   # 5인 이상 22~06시: 통상임금 50% 야간가산
 
 # 단계별 인력 배치 (사장 제외): (근무조, 시간대, 1일 근무시간, 인원)
 STAGES = [
     dict(name="1단계 오픈~3개월", sales=35_000_000, staff=[
-        ("점심", "11:00~15:00", 4, 1), ("저녁·야간", "17:00~01:00", 8, 1)]),
+        ("점심", "11:00~15:00", 4, 1), ("저녁·야간", "17:00~01:00", 8, 1), ("심야", "01:00~07:00", 6, 1)]),
     dict(name="2단계 6개월", sales=70_000_000, staff=[
-        ("점심", "11:00~15:00", 5, 1), ("저녁", "17:00~23:00", 6, 2), ("야간", "21:00~01:00", 4, 1)]),
+        ("점심", "11:00~16:00", 5, 1), ("저녁", "17:00~23:00", 6, 2), ("야간", "21:00~03:00", 6, 1),
+        ("심야", "03:00~07:00", 4, 1)]),
     dict(name="3단계 12개월", sales=100_000_000, staff=[
         ("오전 준비", "09:00~13:00", 4, 1), ("점심", "11:00~16:00", 5, 2),
-        ("저녁", "17:00~23:00", 6, 2), ("야간", "21:00~01:00", 4, 2)]),
+        ("저녁", "17:00~23:00", 6, 2), ("야간", "21:00~03:00", 6, 2), ("심야", "03:00~07:00", 4, 1)]),
     dict(name="4단계 18개월~ (목표)", sales=TARGET, staff=[
         ("오전 준비", "09:00~13:00", 4, 2), ("점심", "11:00~16:00", 5, 2),
-        ("저녁", "17:00~23:00", 6, 4), ("야간", "21:00~01:00", 4, 2)]),
+        ("저녁", "17:00~23:00", 6, 4), ("야간", "21:00~03:00", 6, 2), ("심야", "01:00~07:00", 6, 1)]),
 ]
 
 # 단계별 월 고정비 (원). 월세는 100만 원 고정, 나머지는 물량에 따라 증가
 FIXED_STAGES = {
     "월세": [1_000_000] * 4,
     "관리비": [100_000] * 4,
-    "전기": [350_000, 550_000, 750_000, 950_000],
-    "가스": [300_000, 450_000, 600_000, 800_000],
+    "전기 (21시간: 조명·후드 +25%)": [440_000, 690_000, 940_000, 1_190_000],
+    "가스 (21시간: +15%)": [350_000, 520_000, 690_000, 920_000],
     "수도": [80_000, 120_000, 160_000, 220_000],
     "통신·POS·주문접수": [70_000, 70_000, 90_000, 90_000],
     "음식물·폐기물": [50_000, 80_000, 120_000, 150_000],
@@ -82,13 +84,37 @@ def orders_for(sales, bs):
     return total, [total * b["share"] for b in bs]
 
 
-def labor(stage):
-    daily_hours = sum(h * n for _, _, h, n in stage["staff"])
+def is_night(hh):
+    return hh % 24 >= 22 or hh % 24 < 6
+
+
+def shift_cost(time, big):
+    """근무조 1인의 하루 인건비와 그중 야간(22~06시) 시간."""
+    a, b = _span(time)
+    night = sum(1 for hh in range(a, b) if is_night(hh))
+    day = (b - a) - night
+    if not big:
+        return (b - a) * SMALL_HOURLY, night
+    return day * BIG_DAY_HOURLY + night * BIG_NIGHT_HOURLY, night
+
+
+def labor(stage, window=None):
+    """window=(시작hh, 끝hh)를 주면 그 시간대에 해당하는 인건비만 계산."""
     headcount = sum(n for *_, n in stage["staff"])   # 하루 근무 인원 = 상시근로자 수 근사
     big = headcount >= 5
-    hourly = NIGHT_PREMIUM_HOURLY if big else SMALL_HOURLY
-    return dict(daily_hours=daily_hours, month_hours=daily_hours * 30, headcount=headcount,
-                big=big, hourly=hourly, cost=daily_hours * 30 * hourly)
+    daily_hours = daily_cost = night_hours = 0
+    for _, time, _, n in stage["staff"]:
+        a, b = _span(time)
+        for hh in range(a, b):
+            if window and not (window[0] <= hh < window[1]):
+                continue
+            rate = BIG_NIGHT_HOURLY if big and is_night(hh) else (BIG_DAY_HOURLY if big else SMALL_HOURLY)
+            daily_hours += n
+            daily_cost += n * rate
+            night_hours += n if is_night(hh) else 0
+    return dict(daily_hours=daily_hours, month_hours=daily_hours * 30, headcount=headcount, big=big,
+                night_hours=night_hours * 30, hourly=round(daily_cost / daily_hours) if daily_hours else 0,
+                cost=daily_cost * 30)
 
 
 def stage_pnl(i, stage, bs):
@@ -220,28 +246,29 @@ def sheet_roadmap(wb, results):
 
 def sheet_staff(wb):
     ws = wb.create_sheet("단계별_인력표")
-    put(ws, 1, 1, "단계별 인력 배치 (사장은 매일 10시간 근무, 아래는 사장 외 인력)", font=Font(bold=True, size=13))
+    put(ws, 1, 1, "단계별 인력 배치 — 21시간 영업 10:00~07:00 (사장 10~20시 근무, 아래는 사장 외 인력)", font=Font(bold=True, size=13))
     r = 3
     for s in STAGES:
         lab = labor(s)
         put(ws, r, 1, f"{s['name']} — 월매출 {money(s['sales'])}", font=B, fill=SUB)
         r += 1
-        header(ws, r, ["근무조", "시간대", "1일 근무시간", "인원", "1일 인시", "월 인시", "적용 시급", "월 인건비"])
+        header(ws, r, ["근무조", "시간대", "1일 근무시간", "인원", "그중 야간(22~06)", "월 인시", "평균 시급", "월 인건비"])
         r += 1
         for shift, time, h, n in s["staff"]:
+            day_cost, night = shift_cost(time, lab["big"])
             for c, (v, fmt) in enumerate([(shift, None), (time, None), (h, '0"시간"'), (n, '0"명"'),
-                                           (h * n, '0"시간"'), (h * n * 30, '#,##0"시간"'),
-                                           (lab["hourly"], WON), (h * n * 30 * lab["hourly"], WON)], 1):
+                                           (night, '0"시간"'), (h * n * 30, '#,##0"시간"'),
+                                           (round(day_cost / h), WON), (day_cost * n * 30, WON)], 1):
                 put(ws, r, c, v, fmt)
             r += 1
         put(ws, r, 1, "합계", font=B)
         put(ws, r, 4, lab["headcount"], '0"명"', font=B)
-        put(ws, r, 5, lab["daily_hours"], '0"시간"', font=B)
+        put(ws, r, 5, lab["night_hours"] // 30, '0"시간"', font=B)
         put(ws, r, 6, lab["month_hours"], '#,##0"시간"', font=B)
         put(ws, r, 8, lab["cost"], WON, font=B)
         r += 1
-        put(ws, r, 1, "5인 이상 사업장 → 야간(22~06시) 50% 가산·4대보험 반영 평균 시급" if lab["big"]
-            else "5인 미만 사업장 → 주휴수당·산재·고용보험만 반영")
+        put(ws, r, 1, f"5인 이상 사업장 → 주간 {BIG_DAY_HOURLY:,}원, 야간(22~06시) {BIG_NIGHT_HOURLY:,}원 (통상임금 50% 가산)"
+            if lab["big"] else f"5인 미만 사업장 → 전 시간 {SMALL_HOURLY:,.0f}원 (주휴·산재·고용보험, 야간가산 의무 없음)")
         r += 2
     ws.column_dimensions["A"].width = 16
     ws.column_dimensions["B"].width = 16
@@ -273,6 +300,7 @@ def build_target_sheets(wb):
     sheet_staff(wb)
     sheet_fixed(wb)
     sheet_hourly(wb)
+    sheet_late_night(wb, bs, results)
     for s, p in zip(STAGES, results):
         print(f"{s['name']}: 일 {p['total'] / 30:.0f}건, 공헌 {p['contrib']:,.0f}, 인건비 {p['labor']['cost']:,.0f} "
               f"({p['labor']['headcount']}명), 고정 {p['fixed']:,.0f}, 영업이익 {p['profit']:,.0f} "
@@ -280,27 +308,34 @@ def build_target_sheets(wb):
 
 
 # ── 시간대별 처리량 ─────────────────────────────────────────────────────
-HOURS = list(range(11, 24)) + [0]       # 11시 ~ 새벽 0시대 (01시 마감)
+HOURS = list(range(10, 24)) + list(range(0, 7))   # 10:00 ~ 다음날 07:00 (21시간), 07~10시 청소·밑준비
 
 # 브랜드별 시간대 주문 비중 (합 = 1). 덮밥은 점심, 닭발은 야식, 찜·탕은 저녁 중심
-PROFILES = {
-    "김치찜": [.03, .09, .06, .03, .02, .03, .07, .16, .18, .12, .08, .06, .04, .03],
-    "제육덮밥": [.08, .22, .14, .05, .03, .03, .07, .13, .12, .07, .03, .02, .01, .00],
-    "닭발": [.00, .01, .01, .01, .01, .02, .04, .08, .11, .13, .15, .16, .14, .13],
-    "곱도리탕": [.01, .03, .02, .01, .01, .03, .08, .16, .19, .16, .11, .08, .06, .05],
+_RAW = {   # 10시 ~ 다음날 06시대, 상대 가중치 (아래에서 합 1로 정규화)
+    "김치찜": [1, 3, 9, 6, 3, 2, 3, 7, 16, 18, 12, 8, 6, 4, 3, 2, 1.2, .6, .3, .3, .5],
+    "제육덮밥": [2, 8, 22, 14, 5, 3, 3, 7, 13, 12, 7, 3, 2, 1, .5, .4, .2, .1, .1, .3, .8],
+    "닭발": [0, 0, 1, 1, 1, 1, 2, 4, 8, 11, 13, 15, 16, 14, 13, 10, 7, 4, 2, 1, .5],
+    "곱도리탕": [.5, 1, 3, 2, 1, 1, 3, 8, 16, 19, 16, 11, 8, 6, 5, 3.5, 2, 1, .5, .3, .3],
 }
-OWNER_HOURS = (11, 21)       # 사장 근무 11~21시
+PROFILES = {k: [v / sum(vs) for v in vs] for k, vs in _RAW.items()}
+OWNER_HOURS = (10, 20)       # 사장 근무 10~20시
+LATE = (25, 31)              # 심야 구간 01~07시 (hh 표기)
 PER_PERSON = 8               # 1인당 시간당 처리 (사전 조리된 찜·탕 데우기·담기·포장 기준)
 EQUIP_CAP = 40               # 15평 주방 설비 한계 (화구 6구 + 작업대 2, 시간당)
 
 
+def _hh(h):
+    return h + 24 if h < 9 else h
+
+
 def _span(time):
-    a, b = (int(t.split(":")[0]) for t in time.split("~"))
+    """'21:00~03:00' → (21, 27). 09시 이전은 전날 영업의 연장으로 본다."""
+    a, b = (_hh(int(t.split(":")[0])) for t in time.split("~"))
     return a, (b + 24 if b <= a else b)
 
 
 def staff_on(stage, h):
-    hh = h + 24 if h < 9 else h
+    hh = _hh(h)
     n = 1 if OWNER_HOURS[0] <= hh < OWNER_HOURS[1] else 0
     for _, time, _, cnt in stage["staff"]:
         a, b = _span(time)
@@ -335,7 +370,7 @@ def sheet_hourly(wb):
 
     bs = brands(plan_b=True)
     ws = wb.create_sheet("시간대별_처리량")
-    put(ws, 1, 1, f"시간대별 주문 수요 vs 처리 가능량 (1인당 시간당 {PER_PERSON}건, 주방 설비 한계 시간당 {EQUIP_CAP}건, 사장 11~21시 근무)",
+    put(ws, 1, 1, f"시간대별 주문 수요 vs 처리 가능량 (1인당 시간당 {PER_PERSON}건, 주방 설비 한계 시간당 {EQUIP_CAP}건, 사장 10~20시 근무)",
         font=Font(bold=True, size=13))
     r = 3
     for s in STAGES:
@@ -392,7 +427,7 @@ def draw_hourly_png(path, font_dir):
     INK, INK2, GRID, SURF = "#0b0b0b", "#52514e", "#e6e5e1", "#fcfcfb"
     SERIES = ["#2a78d6", "#eb6834", "#1baf7a", "#eda100"]      # 기준 팔레트 1~4번 고정 순서
     bs = brands(plan_b=True)
-    fig, axes = plt.subplots(2, 2, figsize=(13, 8.2), sharey=True, facecolor=SURF)
+    fig, axes = plt.subplots(2, 2, figsize=(15, 8.4), sharey=True, facecolor=SURF)
     x = list(range(len(HOURS)))
     labels = [f"{h:02d}" for h in HOURS]
     ymax = max(max(max(r["total"], r["cap"]) for r in hourly(s, bs)) for s in STAGES) * 1.18
@@ -428,8 +463,55 @@ def draw_hourly_png(path, font_dir):
         ax.set_xlabel("시간대 (시)", color=INK2, fontsize=9)
     handles, labs = axes[0, 0].get_legend_handles_labels()
     fig.legend(handles, labs, loc="upper center", ncol=5, frameon=False, fontsize=9.5, bbox_to_anchor=(0.5, 0.965))
-    fig.suptitle("시간대별 주문 수요(막대) vs 주방 처리 가능량(선)", fontsize=14, fontweight="bold", color=INK, y=0.995)
-    fig.text(0.5, 0.005, f"처리 가능량 = min(근무 인원 × {PER_PERSON}건, 설비 한계 {EQUIP_CAP}건) · 사장 11~21시 근무 포함 · 플랜 B 메뉴 기준",
+    fig.suptitle("21시간 영업(10:00~07:00) 시간대별 주문 수요(막대) vs 주방 처리 가능량(선)", fontsize=14, fontweight="bold", color=INK, y=0.995)
+    fig.text(0.5, 0.005, f"처리 가능량 = min(근무 인원 × {PER_PERSON}건, 설비 한계 {EQUIP_CAP}건) · 사장 10~20시 근무 포함 · 플랜 B 메뉴 기준",
              ha="center", fontsize=8.5, color=INK2)
     fig.tight_layout(rect=(0, 0.02, 1, 0.93))
     fig.savefig(path, dpi=150, facecolor=SURF)
+
+
+# 21시간 영업으로 늘어난 공과금 (14시간 영업 대비): 전기 +25%, 가스 +15%
+EXTRA_UTIL = [140_000, 210_000, 280_000, 360_000]
+
+
+def late_night(i, stage, bs, pnl):
+    """01~07시 심야 영업이 스스로 비용을 버는지."""
+    rows = hourly(stage, bs)
+    orders_day = sum(r["total"] for r in rows if LATE[0] <= _hh(r["hour"]) < LATE[1])
+    lab = labor(stage, window=LATE)["cost"]
+    cost = lab + EXTRA_UTIL[i]
+    per_order = pnl["contrib"] / pnl["total"]
+    need_day = cost / per_order / 30
+    return dict(orders_day=orders_day, labor=lab, util=EXTRA_UTIL[i], cost=cost, per_order=per_order,
+                need_day=need_day, profit=orders_day * 30 * per_order - cost)
+
+
+def sheet_late_night(wb, bs, results):
+    ws = wb.create_sheet("21시간_심야손익")
+    put(ws, 1, 1, "21시간 영업 중 심야(01~07시) 6시간이 스스로 비용을 버는가", font=Font(bold=True, size=13))
+    header(ws, 3, ["항목"] + [s["name"] for s in STAGES])
+    data = [late_night(i, s, bs, p) for i, (s, p) in enumerate(zip(STAGES, results))]
+    lines = [("심야 인건비 (01~07시분)", "labor", WON), ("추가 공과금 (전기·가스)", "util", WON),
+             ("심야 영업 비용 합계", "cost", WON), ("건당 공헌이익 (평균)", "per_order", WON),
+             ("손익분기 심야 주문 (하루)", "need_day", '0.0"건"'), ("시뮬레이션상 심야 주문 (하루)", "orders_day", '0.0"건"'),
+             ("심야 영업 손익 (월)", "profit", WON)]
+    for r, (label, key, fmt) in enumerate(lines, 4):
+        put(ws, r, 1, label, font=B if key in ("need_day", "profit") else None)
+        for j, d in enumerate(data, 2):
+            f = Font(bold=True, color="C0392B" if d[key] < 0 else "0F8F8A") if key == "profit" else None
+            put(ws, r, j, round(d[key], 1), fmt, font=f)
+    r = len(lines) + 6
+    put(ws, r, 1, "읽는 법", font=B)
+    for line in [
+        "• 손익분기 심야 주문 = 심야 비용 ÷ 건당 공헌이익. 01~07시에 하루 이만큼 이상 들어와야 심야 영업이 이익입니다.",
+        "• 시뮬레이션상 심야 주문은 같은 월매출을 21시간에 나눠 담은 값입니다. 실제로는 심야 영업이 '추가' 주문을 만들어야 의미가 있습니다.",
+        "• 5인 이상 사업장이 되면 22~06시 근무에 통상임금 50% 야간가산이 붙어 심야 비용이 커집니다.",
+        "• 오픈 후 2~4주는 심야(01~07시) 주문을 시간대별로 기록해 손익분기선과 비교하고, 못 넘으면 03시 마감 등으로 줄이세요.",
+    ]:
+        r += 1
+        put(ws, r, 1, line)
+    ws.column_dimensions["A"].width = 32
+    for col in "BCDE":
+        ws.column_dimensions[col].width = 22
+    for s, d in zip(STAGES, data):
+        print(f"[심야] {s['name']}: 비용 {d['cost']:,.0f} 손익분기 {d['need_day']:.1f}건/일, 가정 {d['orders_day']:.1f}건/일, 손익 {d['profit']:,.0f}")
